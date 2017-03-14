@@ -2,8 +2,8 @@ package aqua.blatt1.broker;
 
 import java.net.InetSocketAddress;
 
-import aqua.blatt1.client.Aqualife;
 import aqua.blatt1.common.Properties;
+import aqua.blatt1.common.msgtypes.DeregisterRequest;
 import aqua.blatt1.common.msgtypes.HandoffRequest;
 import aqua.blatt1.common.msgtypes.RegisterRequest;
 import aqua.blatt1.common.msgtypes.RegisterResponse;
@@ -20,18 +20,27 @@ public class Broker {
 	}
 
 	public static void broker() {
-		while (true) {
-			String[] args = {};
-		//	Message message = endPoint.blockingReceive();
-			Aqualife.main(args);
-			//	register(message.getSender(), (String) message.getPayload());
-
+ 		while (true) {
+ 		 	Message message = endPoint.blockingReceive();
+	 
+		 	if(message.getPayload() instanceof RegisterRequest) 
+		 		register(message.getSender() );
+		 	if(message.getPayload() instanceof DeregisterRequest) 
+		 		deregister((DeregisterRequest) message.getPayload());
+		 	if(message.getPayload() instanceof HandoffRequest) 
+		 		handoffFish((RegisterResponse) message.getPayload(),  message.getSender(), (HandoffRequest) message.getPayload()); 
+				
+			
+		 	 
+		  
+		 	
+		 	
 		}
 	}
 
-	private static void register(InetSocketAddress broker, String id) {
+	private static void register(InetSocketAddress broker ) {
 		int counter = 0;
-		id = FISH_NAME + counter;
+		String id = FISH_NAME + counter;
 		clients.add(id, broker);
 		counter++;
 
@@ -39,15 +48,17 @@ public class Broker {
 
 	}
 
-	private static void deregister(String id) {
-		int index = clients.indexOf(id);
+	private static void deregister( DeregisterRequest deregisterRequest) {
+		
+		int index = clients.indexOf(deregisterRequest.getId());
 		if (index != -1)
 			clients.remove(index);
 
 	}
 
-	private static void handoffFish(String id, InetSocketAddress broker, HandoffRequest handoffRequest) {
-		int index = clients.indexOf(id);
+	private static void handoffFish(RegisterResponse registerResponse, InetSocketAddress broker, HandoffRequest handoffRequest) {
+	
+		int index = clients.indexOf(registerResponse.getId());
 
 		if (handoffRequest.getFish().getDirection().equals("LEFT"))
 			broker = clients.getLeftNeighorOf(index);
