@@ -2,6 +2,7 @@ package aqua.blatt1.client;
 
 import javax.swing.SwingUtilities;
 
+
 public class Aqualife {
 
 	public static void main(String[] args) {
