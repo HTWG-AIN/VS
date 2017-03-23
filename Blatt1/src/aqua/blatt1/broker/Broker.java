@@ -21,8 +21,7 @@ public class Broker {
 	}
 
 	public static void broker() {
-//		String[] args = {};
-//		Aqualife.main(args);
+ 
 		while (true) {
 
 			Message message = endPoint.blockingReceive();
