@@ -2,8 +2,7 @@ package aqua.blatt1.broker;
 
 import java.net.InetSocketAddress;
 
-import aqua.blatt1.client.Aqualife;
-import aqua.blatt1.common.Properties;
+ import aqua.blatt1.common.Properties;
 import aqua.blatt1.common.msgtypes.DeregisterRequest;
 import aqua.blatt1.common.msgtypes.HandoffRequest;
 import aqua.blatt1.common.msgtypes.RegisterRequest;
@@ -22,8 +21,8 @@ public class Broker {
 	}
 
 	public static void broker() {
-		String[] args = {};
-		Aqualife.main(args);
+//		String[] args = {};
+//		Aqualife.main(args);
 		while (true) {
 
 			Message message = endPoint.blockingReceive();
@@ -54,6 +53,7 @@ public class Broker {
 		int index = clients.indexOf(deregisterRequest.getId());
 		if (index != -1)
 			clients.remove(index);
+
 
 	}
 
