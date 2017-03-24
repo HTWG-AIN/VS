@@ -22,7 +22,7 @@ public class Broker {
 	private static final int NUM_OF_THREADS = 3;
 	private static Endpoint endPoint = new Endpoint(Properties.PORT);
 	private static int counter = 0;
-	private static boolean stopRequested = false;
+	private static volatile boolean stopRequested = false;
 
 	public Broker() {
 	}
@@ -30,7 +30,10 @@ public class Broker {
 	public static class BrokerTask implements Runnable {
 
 		private static Message message;
- 
+
+		public BrokerTask() {
+		}
+
 		public BrokerTask(Message message) {
 			BrokerTask.message = message;
 
@@ -38,23 +41,28 @@ public class Broker {
 
 		@Override
 		public void run() {
- 			playloadMessages(message);
+			playloadMessages(message);
 		}
 
 	}
-	public static class Threads extends Thread{
+
+	public static class Threads extends Thread {
 		public Threads() {
- 		}
-		public void run(){
-			System.out.println("bin da");
-			int value = JOptionPane.showConfirmDialog(null, "Do you want to end the Thread ? " ,"End", JOptionPane.YES_NO_CANCEL_OPTION);
-				if (value ==  JOptionPane.YES_OPTION) {
-					System.out.println("wir gesetzt");
- 					 stopRequested = true;
-				}
+		}
+
+		@Override
+		public void run() {
+			int value = JOptionPane.showConfirmDialog(null, "Do you want to start the Threads ? ", "Start",
+					JOptionPane.YES_NO_OPTION);
+
+			if (value == JOptionPane.YES_OPTION)
+				stopRequested = true;
+			else
+				System.exit(0);
 
 		}
 	}
+
 	private static void playloadMessages(Message message) {
 
 		if (message.getPayload() instanceof RegisterRequest)
@@ -66,15 +74,15 @@ public class Broker {
 	}
 
 	public static void broker() throws InterruptedException {
-		Threads threads = new Threads();
-		threads.start();
-		TimeUnit.SECONDS.sleep(1);
+
 		ExecutorService executor = Executors.newFixedThreadPool(NUM_OF_THREADS);
 		Runnable runner;
-		
-		
-		System.out.println("hier bin ich " + stopRequested);
-		if (!stopRequested) {
+
+		Threads threads = new Threads();
+		threads.start();
+		TimeUnit.SECONDS.sleep(10);
+
+		if (stopRequested)
 			while (true) {
 
 				Message message = endPoint.blockingReceive();
@@ -82,12 +90,11 @@ public class Broker {
 				executor.execute(runner);
 
 			}
-		}
+
 		executor.shutdown();
- 
+
 	}
 
-	 
 	private static void register(InetSocketAddress broker) {
 
 		String id = FISH_NAME + counter;
