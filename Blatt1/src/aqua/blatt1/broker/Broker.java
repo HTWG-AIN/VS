@@ -16,7 +16,7 @@ public class Broker {
 	private final static String FISH_NAME = "HTWG ";
 	private static Endpoint endPoint = new Endpoint(Properties.PORT);
 	private static int counter = 0;
-
+// test
 	public Broker() {
 	}
 
